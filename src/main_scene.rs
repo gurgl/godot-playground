@@ -1,7 +1,7 @@
 use crate::hud;
 use crate::mob;
 use crate::player;
-use gdnative::api::{PathFollow2D, Position2D, RigidBody2D};
+use gdnative::api::{PathFollow2D, Position2D, RigidBody2D, AudioStreamPlayer};
 use gdnative::prelude::*;
 use rand::*;
 use std::f64::consts::PI;
@@ -30,6 +30,9 @@ impl Main {
         let score_timer = unsafe { owner.get_node_as::<Timer>("score_timer").unwrap() };
         let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
 
+        let music = unsafe { owner.get_node_as::<AudioStreamPlayer>("Music").unwrap() };
+        music.stop();
+
         score_timer.stop();
         mob_timer.stop();
 
@@ -42,6 +45,8 @@ impl Main {
     #[method]
     fn new_game(&mut self, #[base] owner: &Node) {
         godot_print!("new_game");
+        let music = unsafe { owner.get_node_as::<AudioStreamPlayer>("Music").unwrap() };
+        music.play(0.0);
         let start_position = unsafe { owner.get_node_as::<Position2D>("start_position").unwrap() };
         let player = unsafe {
             owner

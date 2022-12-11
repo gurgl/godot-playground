@@ -93,15 +93,16 @@ let
         # enableParallelBuilding = true;
   };
 
-  custPkgs = pkgs // {
-    rust = pkgs.rust // {
-      packages = pkgs.rust.packages // {
-        stable = pkgs.rust.packages.stable // {
-          gdnative = gdnative;
-        };
-      };
-    };
-  };
+  # custPkgs = pkgs // {
+  #   rust = pkgs.rust // {
+  #     packages = pkgs.rust.packages // {
+  #       stable = pkgs.rust.packages.stable // {
+  #         gdnative = gdnative;
+  #       };
+  #     };
+  #   };
+  # };
+  custPkgs = pkgs;
 in rec {
   pkgs = custPkgs;
   nixgl = _nixgl;

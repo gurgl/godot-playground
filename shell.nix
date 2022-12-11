@@ -14,14 +14,24 @@ in
             custPkgs.cargo
             custPkgs.rustfmt
             custPkgs.libclang
+            custPkgs.alsaPlugins
+            # custPkgs.alsaPluginWrapper
+            # custPkgs.alsaLib
+            # custPkgs.alsaUtils
+            # custPkgs.alsaTools
+            # # custPkgs.apulse
+            # custPkgs.libpulseaudio
 
-            custPkgs.rust.packages.stable.gdnative
+            # custPkgs.rust.packages.stable.gdnative
             # Godot Engine Editor
             custPkgs.godot
             # The support for OpenGL in Nix
             nixgl.auto.nixGLDefault
         ];
+        nativeBuildInputs = [ custPkgs.pkgconfig ];
 
+
+        ALSA_PLUGIN_DIR = "${custPkgs.alsaPlugins}/lib/alsa-lib";
         # Point bindgen to where the clang library would be
         LIBCLANG_PATH = "${custPkgs.libclang.lib}/lib";
         # Make clang aware of a few headers (stdbool.h, wchar.h)
