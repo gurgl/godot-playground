@@ -1,23 +1,17 @@
 use gdnative::prelude::*;
 
-#[derive(NativeClass)]
-#[inherit(Node)]
-struct HelloWorld;
-
-#[methods]
-impl HelloWorld {
-    fn new(_owner: &Node) -> Self {
-        HelloWorld
-    }
-
-    #[method]
-    fn _ready(&self) {
-        godot_print!("hello, world.")
-    }
-}
+mod hud;
+mod main_scene;
+mod mob;
+mod player;
 
 fn init(handle: InitHandle) {
-    handle.add_class::<HelloWorld>();
+    godot_print!("init");
+    handle.add_class::<player::Player>();
+    handle.add_class::<mob::Mob>();
+    handle.add_class::<main_scene::Main>();
+    handle.add_class::<hud::Hud>();
+    godot_print!("end");
 }
 
 godot_init!(init);

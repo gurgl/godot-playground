@@ -34,7 +34,7 @@ let
           libpulseaudio
           freetype
           openssl
-            alsa-lib
+          alsa-lib
           libGLU
           zlib
           yasm

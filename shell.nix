@@ -15,7 +15,7 @@ in
             custPkgs.rustfmt
             custPkgs.libclang
 
-            custPkgs.rust.packages.stable.  gdnative
+            custPkgs.rust.packages.stable.gdnative
             # Godot Engine Editor
             custPkgs.godot
             # The support for OpenGL in Nix
