@@ -2,6 +2,11 @@ let
 tmp = import ./nix/thing.nix {};
 custPkgs = tmp.pkgs;
 nixgl = tmp.nixgl;
+
+rust-toolchain = custPkgs.symlinkJoin {
+    name = "rust-toolchain";
+    paths = [custPkgs.rustc custPkgs.cargo custPkgs.rustPlatform.rustcSrc custPkgs.rust-analyzer];
+    };
 in
     
     
@@ -10,9 +15,10 @@ in
     custPkgs.mkShell.override { stdenv = custPkgs.clangStdenv; } {
         buildInputs = [
             # Rust related dependencies
+            rust-toolchain
             custPkgs.rustc
-            custPkgs.cargo
-            custPkgs.rustfmt
+            #custPkgs.cargo
+            #custPkgs.rustfmt
             custPkgs.libclang
             custPkgs.alsaPlugins
             # custPkgs.alsaPluginWrapper
@@ -43,6 +49,8 @@ in
 
         # For Rust language server and rust-analyzer
         RUST_SRC_PATH = "${custPkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
+
+        RUST_TOOLCHAIN = "${rust-toolchain}";
 
         # Alias the godot engine to use nixGL
         shellHook = ''

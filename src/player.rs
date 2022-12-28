@@ -1,5 +1,6 @@
 use gdnative::api::{AnimatedSprite, Area2D, CollisionShape2D, PhysicsBody2D};
 use gdnative::prelude::*;
+use gdnative::prelude::{Ref};
 
 /// The player "class"
 #[derive(NativeClass)]

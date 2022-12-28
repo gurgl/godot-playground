@@ -47,6 +47,8 @@ impl Main {
         godot_print!("new_game");
         let music = unsafe { owner.get_node_as::<AudioStreamPlayer>("Music").unwrap() };
         music.play(0.0);
+        
+        
         let start_position = unsafe { owner.get_node_as::<Position2D>("start_position").unwrap() };
         let player = unsafe {
             owner
