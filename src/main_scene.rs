@@ -1,5 +1,6 @@
 use crate::hud;
 use crate::mob;
+use crate::ball;
 use crate::player;
 use gdnative::api::{PathFollow2D, Position2D, RigidBody2D, AudioStreamPlayer};
 use gdnative::prelude::*;
@@ -65,6 +66,11 @@ impl Main {
             .unwrap_or_else(|| godot_print!("Unable to get player"));
 
         start_timer.start(0.0);
+
+        let ball = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap() };
+        //let ball_scene: Ref<RigidBody2D, _> = instance_scene(&ball);
+
+        ball.owner.set_position(Vector2::new { x: 0.5, y: 0.5 });
 
         let hud = unsafe { owner.get_node_as_instance::<hud::Hud>("hud").unwrap() };
         hud.map(|x, o| {
