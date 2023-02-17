@@ -16,7 +16,7 @@ pub struct Ball {
 impl Ball {
     fn new(_owner: &RigidBody2D) -> Self {
         Ball {
-            speed: 150.0,
+            speed: 1.0,
         }
     }
 

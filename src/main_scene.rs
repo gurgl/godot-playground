@@ -75,21 +75,24 @@ impl Main {
         //owner.add_child(ball_scene, false);
         //ball.owner.set_position(Vector2::new(0.5, 0.5));
         
-        let ship_scene = ResourceLoader::godot_singleton().load(
+        let ball_scene_res = ResourceLoader::godot_singleton().load(
             GodotString::from_str("res://breakout/Ball.tscn"),
             GodotString::from_str("PackedScene"), false);
 
-        if let Some(ship_scene) = ship_scene.and_then(|s| s.cast::<PackedScene>()) {
+        if let Some(ball_scene_res) = ball_scene_res.and_then(|s| s.cast::<PackedScene>()) {
             godot_print!("StarWorldLink Have scene");
-            self.ball = ship_scene;
+            self.ball = ball_scene_res;
             let ball_scene: Ref<RigidBody2D, _> = instance_scene(&self.ball);
-            //let pos = Vector2::new(1.5, 1.5);
+            let pos = Vector2::new(100.0, 50.0);
             
-            let pos = start_position.position();
+            //let pos = start_position.position();
+            ball_scene.set_linear_velocity(Vector2::new(0.0,100.0));
             ball_scene.set_position(pos);
+            
             //ball_scene.set_visible(true);
             owner.add_child(ball_scene, true);
-            godot_print!("Ball loaded");
+            //let res = format!("Ball loaded {:?}",pos);
+            godot_print!("Ball loaded {:?}",pos);
         } else {
             godot_print!("StarWorldLink could not load ship_link scene");
         }
@@ -107,7 +110,7 @@ impl Main {
     fn on_start_timer_timeout(&self, #[base] owner: &Node) {
         let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
         let score_timer = unsafe { owner.get_node_as::<Timer>("score_timer").unwrap() };
-        mob_timer.start(0.0);
+        //mob_timer.start(0.0);
         score_timer.start(0.0);
     }
 
