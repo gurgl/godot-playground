@@ -1,7 +1,7 @@
 use crate::hud;
 use crate::mob;
 use crate::ball;
-use crate::player;
+use crate::player_pad;
 use gdnative::api::ResourcePreloader;
 use gdnative::api::{PathFollow2D, Position2D, RigidBody2D, AudioStreamPlayer};
 use gdnative::prelude::*;
@@ -56,7 +56,7 @@ impl Main {
         let start_position = unsafe { owner.get_node_as::<Position2D>("start_position").unwrap() };
         let player = unsafe {
             owner
-                .get_node_as_instance::<player::Player>("player")
+                .get_node_as_instance::<player_pad::PlayerPad>("pad")
                 .unwrap()
         };
         let start_timer = unsafe { owner.get_node_as::<Timer>("start_timer").unwrap() };
@@ -110,7 +110,7 @@ impl Main {
     fn on_start_timer_timeout(&self, #[base] owner: &Node) {
         let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
         let score_timer = unsafe { owner.get_node_as::<Timer>("score_timer").unwrap() };
-        //mob_timer.start(0.0);
+        mob_timer.start(0.0);
         score_timer.start(0.0);
     }
 

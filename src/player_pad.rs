@@ -5,9 +5,9 @@ use gdnative::prelude::{Ref};
 /// The player "class"
 #[derive(NativeClass)]
 #[inherit(Area2D)]
-#[user_data(user_data::MutexData<Player>)]
+#[user_data(user_data::MutexData<PlayerPad>)]
 #[register_with(Self::register_player)]
-pub struct Player {
+pub struct PlayerPad {
     #[property(default = 400.0)]
     speed: f32,
 
@@ -15,13 +15,13 @@ pub struct Player {
 }
 
 #[methods]
-impl Player {
+impl PlayerPad {
     fn register_player(builder: &ClassBuilder<Self>) {
         builder.signal("hit").done()
     }
 
     fn new(_owner: &Area2D) -> Self {
-        Player {
+        PlayerPad {
             speed: 400.0,
             screen_size: Vector2::new(0.0, 0.0),
         }
@@ -36,48 +36,24 @@ impl Player {
 
     #[method]
     fn _process(&mut self, #[base] owner: &Area2D, delta: f32) {
-        let animated_sprite = unsafe {
-            owner
-                .get_node_as::<AnimatedSprite>("animated_sprite")
-                .unwrap()
-        };
-
+        //godot_print!("pad process");
         let input = Input::godot_singleton();
         let mut velocity = Vector2::new(0.0, 0.0);
 
         // Note: exact=false by default, in Rust we have to provide it explicitly
         if Input::is_action_pressed(input, "ui_right", false) {
+            godot_print!("right");
             velocity.x += 1.0
         }
         if Input::is_action_pressed(input, "ui_left", false) {
+            godot_print!("left");
             velocity.x -= 1.0
         }
-        if Input::is_action_pressed(input, "ui_down", false) {
-            velocity.y += 1.0
-        }
-        if Input::is_action_pressed(input, "ui_up", false) {
-            velocity.y -= 1.0
-        }
+        
 
         if velocity.length() > 0.0 {
             velocity = velocity.normalized() * self.speed;
 
-            let animation;
-
-            if velocity.x != 0.0 {
-                animation = "right";
-
-                animated_sprite.set_flip_v(false);
-                animated_sprite.set_flip_h(velocity.x < 0.0)
-            } else {
-                animation = "up";
-
-                animated_sprite.set_flip_v(velocity.y > 0.0)
-            }
-
-            animated_sprite.play(animation, false);
-        } else {
-            animated_sprite.stop();
         }
 
         let change = velocity * delta;
@@ -90,7 +66,7 @@ impl Player {
     }
 
     #[method]
-    fn on_player_body_entered(&self, #[base] owner: &Area2D, _body: Ref<PhysicsBody2D>) {
+    fn on_pad_body_entered(&self, #[base] owner: &Area2D, _body: Ref<PhysicsBody2D>) {
         owner.hide();
         owner.emit_signal("hit", &[]);
 
@@ -107,7 +83,7 @@ impl Player {
     pub fn start(&self, #[base] owner: &Area2D, pos: Vector2) {
         owner.set_global_position(pos);
         owner.show();
-
+        godot_print!("start pad");
         let collision_shape = unsafe {
             owner
                 .get_node_as::<CollisionShape2D>("collision_shape_2d")
