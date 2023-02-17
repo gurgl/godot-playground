@@ -2,6 +2,7 @@ use crate::hud;
 use crate::mob;
 use crate::ball;
 use crate::player;
+use gdnative::api::ResourcePreloader;
 use gdnative::api::{PathFollow2D, Position2D, RigidBody2D, AudioStreamPlayer};
 use gdnative::prelude::*;
 use rand::*;
@@ -13,6 +14,7 @@ use std::f64::consts::PI;
 pub struct Main {
     #[property]
     mob: Ref<PackedScene>,
+    ball: Ref<PackedScene>,
     score: i64,
 }
 
@@ -22,6 +24,7 @@ impl Main {
         godot_print!("Main::new");
         Main {
             mob: PackedScene::new().into_shared(),
+            ball: PackedScene::new().into_shared(),
             score: 0,
         }
     }
@@ -67,10 +70,29 @@ impl Main {
 
         start_timer.start(0.0);
 
-        let ball = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap() };
+        //let ball = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap() };
         //let ball_scene: Ref<RigidBody2D, _> = instance_scene(&ball);
+        //owner.add_child(ball_scene, false);
+        //ball.owner.set_position(Vector2::new(0.5, 0.5));
+        
+        let ship_scene = ResourceLoader::godot_singleton().load(
+            GodotString::from_str("res://breakout/Ball.tscn"),
+            GodotString::from_str("PackedScene"), false);
 
-        ball.owner.set_position(Vector2::new { x: 0.5, y: 0.5 });
+        if let Some(ship_scene) = ship_scene.and_then(|s| s.cast::<PackedScene>()) {
+            godot_print!("StarWorldLink Have scene");
+            self.ball = ship_scene;
+            let ball_scene: Ref<RigidBody2D, _> = instance_scene(&self.ball);
+            //let pos = Vector2::new(1.5, 1.5);
+            
+            let pos = start_position.position();
+            ball_scene.set_position(pos);
+            //ball_scene.set_visible(true);
+            owner.add_child(ball_scene, true);
+            godot_print!("Ball loaded");
+        } else {
+            godot_print!("StarWorldLink could not load ship_link scene");
+        }
 
         let hud = unsafe { owner.get_node_as_instance::<hud::Hud>("hud").unwrap() };
         hud.map(|x, o| {

@@ -43,6 +43,8 @@ rotation = 0.00192122
 [node name="Music" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 5 )
 
+[node name="ResourcePreloader" type="ResourcePreloader" parent="."]
+
 [connection signal="hit" from="player" to="." method="game_over"]
 [connection signal="timeout" from="mob_timer" to="." method="on_mob_timer_timeout"]
 [connection signal="timeout" from="score_timer" to="." method="on_score_timer_timeout"]
