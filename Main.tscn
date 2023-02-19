@@ -1,7 +1,6 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Main.gdns" type="Script" id=1]
-[ext_resource path="res://Mob.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Player.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Hud.tscn" type="PackedScene" id=4]
 [ext_resource path="res://art/House In a Forest Loop.ogg" type="AudioStream" id=5]
@@ -15,7 +14,6 @@ _data = {
 
 [node name="main" type="Node"]
 script = ExtResource( 1 )
-mob = ExtResource( 2 )
 
 [node name="player" parent="." instance=ExtResource( 3 )]
 

@@ -4,7 +4,7 @@ use crate::ball;
 use crate::brick;
 use crate::player_pad;
 use gdnative::api::ResourcePreloader;
-use gdnative::api::{PathFollow2D, Position2D, RigidBody2D, AudioStreamPlayer, Area2D, InputEventKey};
+use gdnative::api::{PathFollow2D, Position2D, StaticBody2D, RigidBody2D, AudioStreamPlayer, InputEventKey};
 use gdnative::prelude::*;
 use rand::*;
 use std::f64::consts::PI;
@@ -14,9 +14,8 @@ use std::f64::consts::PI;
 #[user_data(user_data::LocalCellData<Main>)]
 pub struct Main {
     #[property]
-    mob: Ref<PackedScene>,
     ball: Ref<PackedScene>,
-    bricks : Vec<Ref<Area2D>>,
+    bricks : Vec<Ref<StaticBody2D>>,
     score: i64,
 }
 
@@ -25,7 +24,6 @@ impl Main {
     fn new(_owner: &Node) -> Self {
         godot_print!("Main::new");
         Main {
-            mob: PackedScene::new().into_shared(),
             ball: PackedScene::new().into_shared(),
             bricks: Vec::new(),
             score: 0,
@@ -35,13 +33,13 @@ impl Main {
     #[method]
     fn game_over(&self, #[base] owner: &Node) {
         let score_timer = unsafe { owner.get_node_as::<Timer>("score_timer").unwrap() };
-        let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
+        //let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
 
         let music = unsafe { owner.get_node_as::<AudioStreamPlayer>("Music").unwrap() };
         music.stop();
 
         score_timer.stop();
-        mob_timer.stop();
+        //mob_timer.stop();
 
         let hud = unsafe { owner.get_node_as_instance::<hud::Hud>("hud").unwrap() };
         hud.map(|x, o| x.show_game_over(&o))
@@ -82,7 +80,7 @@ impl Main {
             godot_print!("brick Have scene 1");
             //let brick = brick_scene_res;
             godot_print!("-3");
-            let brick_scene: Ref<Area2D, _> = instance_scene(&brick_scene_res);
+            let brick_scene: Ref<StaticBody2D, _> = instance_scene(&brick_scene_res);
             //let brick_scene2 =  brick_scene.duplicate();
             godot_print!("-2");
             let pos = Vector2::new(100.0, 50.0);
@@ -135,9 +133,9 @@ impl Main {
 
     #[method]
     fn on_start_timer_timeout(&self, #[base] owner: &Node) {
-        let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
+        //let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
         let score_timer = unsafe { owner.get_node_as::<Timer>("score_timer").unwrap() };
-        mob_timer.start(0.0);
+        //mob_timer.start(0.0);
         score_timer.start(0.0);
     }
 
@@ -151,6 +149,7 @@ impl Main {
             .unwrap_or_else(|| godot_print!("Unable to get hud"));
     }
 
+    /*
     #[method]
     fn on_mob_timer_timeout(&self, #[base] owner: &Node) {
         let mob_spawn_location = unsafe {
@@ -202,6 +201,7 @@ impl Main {
         })
         .unwrap();
     }
+ */
 
 //    #[method]
 //    fn _input(&self, #[base] owner: &Node, event: Ref<InputEvent>) {
