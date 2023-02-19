@@ -1,9 +1,10 @@
 use crate::hud;
 use crate::mob;
 use crate::ball;
+use crate::brick;
 use crate::player_pad;
 use gdnative::api::ResourcePreloader;
-use gdnative::api::{PathFollow2D, Position2D, RigidBody2D, AudioStreamPlayer};
+use gdnative::api::{PathFollow2D, Position2D, RigidBody2D, AudioStreamPlayer, Area2D};
 use gdnative::prelude::*;
 use rand::*;
 use std::f64::consts::PI;
@@ -15,6 +16,7 @@ pub struct Main {
     #[property]
     mob: Ref<PackedScene>,
     ball: Ref<PackedScene>,
+    bricks : Vec<Ref<Area2D>>,
     score: i64,
 }
 
@@ -25,6 +27,7 @@ impl Main {
         Main {
             mob: PackedScene::new().into_shared(),
             ball: PackedScene::new().into_shared(),
+            bricks: Vec::new(),
             score: 0,
         }
     }
@@ -70,28 +73,52 @@ impl Main {
 
         start_timer.start(0.0);
 
-        //let ball = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap() };
-        //let ball_scene: Ref<RigidBody2D, _> = instance_scene(&ball);
-        //owner.add_child(ball_scene, false);
-        //ball.owner.set_position(Vector2::new(0.5, 0.5));
+
+        let brick_scene_res = ResourceLoader::godot_singleton().load(
+            GodotString::from_str("res://breakout/Brick.tscn"),
+            GodotString::from_str("PackedScene"), false);
+
+        if let Some(brick_scene_res) = brick_scene_res.and_then(|s| s.cast::<PackedScene>()) {
+            godot_print!("brick Have scene 1");
+            //let brick = brick_scene_res;
+            godot_print!("-3");
+            let brick_scene: Ref<Area2D, _> = instance_scene(&brick_scene_res);
+            //let brick_scene2 =  brick_scene.duplicate();
+            godot_print!("-2");
+            let pos = Vector2::new(100.0, 50.0);
+            godot_print!("-1");
+            brick_scene.set_position(pos);
+            godot_print!("0");
+            let brick_scene_s = brick_scene.into_shared();
+            godot_print!("1");
+            self.bricks.push(brick_scene_s);
+            godot_print!("2");
+            let brick_scene = unsafe { brick_scene_s.assume_safe() };
+            godot_print!("3");
+            owner.add_child(brick_scene, true);
+        
+            
+            godot_print!("brick loaded {:?}",pos);
+            
+        } else {
+            godot_print!("StarWorldLink could not load ship_link scene");
+        }
+
         
         let ball_scene_res = ResourceLoader::godot_singleton().load(
             GodotString::from_str("res://breakout/Ball.tscn"),
             GodotString::from_str("PackedScene"), false);
 
         if let Some(ball_scene_res) = ball_scene_res.and_then(|s| s.cast::<PackedScene>()) {
-            godot_print!("StarWorldLink Have scene");
+            godot_print!("ball Have scene");
             self.ball = ball_scene_res;
             let ball_scene: Ref<RigidBody2D, _> = instance_scene(&self.ball);
             let pos = Vector2::new(100.0, 50.0);
             
-            //let pos = start_position.position();
             ball_scene.set_linear_velocity(Vector2::new(0.0,100.0));
             ball_scene.set_position(pos);
             
-            //ball_scene.set_visible(true);
             owner.add_child(ball_scene, true);
-            //let res = format!("Ball loaded {:?}",pos);
             godot_print!("Ball loaded {:?}",pos);
         } else {
             godot_print!("StarWorldLink could not load ship_link scene");
@@ -152,7 +179,7 @@ impl Main {
 
         let mob = mob_scene.cast_instance::<mob::Mob>().unwrap();
 
-        godot_print!("on_mob_timer_timeout");
+        //godot_print!("on_mob_timer_timeout");
 
         mob.map(|x, mob_owner| {
             mob_owner

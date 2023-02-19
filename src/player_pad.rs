@@ -42,11 +42,11 @@ impl PlayerPad {
 
         // Note: exact=false by default, in Rust we have to provide it explicitly
         if Input::is_action_pressed(input, "ui_right", false) {
-            godot_print!("right");
+            //godot_print!("right");
             velocity.x += 1.0
         }
         if Input::is_action_pressed(input, "ui_left", false) {
-            godot_print!("left");
+            //godot_print!("left");
             velocity.x -= 1.0
         }
         
@@ -77,6 +77,11 @@ impl PlayerPad {
         };
 
         collision_shape.set_deferred("disabled", true);
+    }
+
+    #[method]
+    fn on_body_entered(&self, #[base] owner: &Area2D, _body: Ref<PhysicsBody2D>) {
+        godot_print!("pad on body entered");
     }
 
     #[method]

@@ -5,10 +5,12 @@ mod main_scene;
 mod mob;
 mod player_pad;
 mod ball;
+mod brick;
 
 fn init(handle: InitHandle) {
     godot_print!("init");
     handle.add_class::<player_pad::PlayerPad>();
+    handle.add_class::<brick::Brick>();
     handle.add_class::<mob::Mob>();
     handle.add_class::<ball::Ball>();
     handle.add_class::<main_scene::Main>();
