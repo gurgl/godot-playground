@@ -4,7 +4,7 @@ use crate::ball;
 use crate::brick;
 use crate::player_pad;
 use gdnative::api::ResourcePreloader;
-use gdnative::api::{PathFollow2D, Position2D, RigidBody2D, AudioStreamPlayer, Area2D};
+use gdnative::api::{PathFollow2D, Position2D, RigidBody2D, AudioStreamPlayer, Area2D, InputEventKey};
 use gdnative::prelude::*;
 use rand::*;
 use std::f64::consts::PI;
@@ -202,6 +202,29 @@ impl Main {
         })
         .unwrap();
     }
+
+//    #[method]
+//    fn _input(&self, #[base] owner: &Node, event: Ref<InputEvent>) {
+//        //if let Some(brick_scene_res) = brick_scene_res.and_then(|s| s.cast::<PackedScene>()) {
+//        //owner.get_tree().map( paused = true
+//        //godot_print!("Input");
+//        
+//        //if let Some(keyEvent) = unsafe { event.assume_safe() }.cast_instance::<InputEventKey>() {
+//        //
+//        //}
+//        //()
+//        if(unsafe { event.assume_safe() }.is_action_pressed("game_pause",false,false)) {
+//            godot_print!("Pause");
+//            owner.get_tree().map(|x| {
+//                let tree = unsafe { x.assume_safe() };
+//                let is_paused = tree.is_paused();
+//                tree.set_pause(!is_paused);
+//                ()
+//            });
+//
+//        }
+//            
+//    }
 }
 
 /// Root here is needs to be the same type (or a parent type) of the node that you put in the child
