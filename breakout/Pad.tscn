@@ -6,7 +6,8 @@
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 50.5, 7 )
 
-[node name="pad" type="Area2D"]
+[node name="pad" type="RigidBody2D"]
+linear_damp = 0.0
 script = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]

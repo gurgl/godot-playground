@@ -5,6 +5,8 @@
 [sub_resource type="CircleShape2D" id=1]
 
 [node name="ball" type="RigidBody2D"]
+linear_damp = 0.0
+angular_damp = 0.0
 
 [node name="Sprite" type="Sprite" parent="."]
 texture = ExtResource( 1 )

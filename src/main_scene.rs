@@ -111,9 +111,9 @@ impl Main {
             godot_print!("ball Have scene");
             self.ball = ball_scene_res;
             let ball_scene: Ref<RigidBody2D, _> = instance_scene(&self.ball);
-            let pos = Vector2::new(100.0, 50.0);
+            let pos = Vector2::new(100.0, 100.0);
             
-            ball_scene.set_linear_velocity(Vector2::new(0.0,100.0));
+            ball_scene.set_linear_velocity(Vector2::new(0.0,-200.0));
             ball_scene.set_position(pos);
             
             owner.add_child(ball_scene, true);

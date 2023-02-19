@@ -1,10 +1,10 @@
-use gdnative::api::{AnimatedSprite, Area2D, CollisionShape2D, PhysicsBody2D};
+use gdnative::api::{AnimatedSprite, RigidBody2D, CollisionShape2D, PhysicsBody2D};
 use gdnative::prelude::*;
 use gdnative::prelude::{Ref};
 
 /// The player "class"
 #[derive(NativeClass)]
-#[inherit(Area2D)]
+#[inherit(RigidBody2D)]
 #[user_data(user_data::MutexData<PlayerPad>)]
 #[register_with(Self::register_player)]
 pub struct PlayerPad {
@@ -20,7 +20,7 @@ impl PlayerPad {
         builder.signal("hit").done()
     }
 
-    fn new(_owner: &Area2D) -> Self {
+    fn new(_owner: &RigidBody2D) -> Self {
         PlayerPad {
             speed: 400.0,
             screen_size: Vector2::new(0.0, 0.0),
@@ -28,14 +28,14 @@ impl PlayerPad {
     }
 
     #[method]
-    fn _ready(&mut self, #[base] owner: &Area2D) {
+    fn _ready(&mut self, #[base] owner: &RigidBody2D) {
         let viewport = owner.get_viewport_rect();
         self.screen_size = viewport.size;
         owner.hide();
     }
 
     #[method]
-    fn _process(&mut self, #[base] owner: &Area2D, delta: f32) {
+    fn _process(&mut self, #[base] owner: &RigidBody2D, delta: f32) {
         //godot_print!("pad process");
         let input = Input::godot_singleton();
         let mut velocity = Vector2::new(0.0, 0.0);
@@ -66,7 +66,7 @@ impl PlayerPad {
     }
 
     #[method]
-    fn on_pad_body_entered(&self, #[base] owner: &Area2D, _body: Ref<PhysicsBody2D>) {
+    fn on_pad_body_entered(&self, #[base] owner: &RigidBody2D, _body: Ref<PhysicsBody2D>) {
         owner.hide();
         owner.emit_signal("hit", &[]);
 
@@ -80,12 +80,12 @@ impl PlayerPad {
     }
 
     #[method]
-    fn on_body_entered(&self, #[base] owner: &Area2D, _body: Ref<PhysicsBody2D>) {
+    fn on_body_entered(&self, #[base] owner: &RigidBody2D, _body: Ref<PhysicsBody2D>) {
         godot_print!("pad on body entered");
     }
 
     #[method]
-    pub fn start(&self, #[base] owner: &Area2D, pos: Vector2) {
+    pub fn start(&self, #[base] owner: &RigidBody2D, pos: Vector2) {
         owner.set_global_position(pos);
         owner.show();
         godot_print!("start pad");

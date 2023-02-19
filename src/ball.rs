@@ -1,4 +1,4 @@
-use gdnative::api::{AnimatedSprite, RigidBody2D};
+use gdnative::api::{AnimatedSprite, RigidBody2D, KinematicBody2D};
 use gdnative::prelude::*;
 use rand::seq::SliceRandom;
 
@@ -19,6 +19,11 @@ impl Ball {
             speed: 1.0,
         }
     }
+
+    #[method]
+    fn _physics_process(&mut self, #[base] owner: &RigidBody2D, delta:f32) {
+        //let collision_info = owner.move_and_collide(delta * )
+    } 
 
     #[method]
     fn _ready(&mut self, #[base] owner: &RigidBody2D) {
