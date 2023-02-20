@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Main.gdns" type="Script" id=1]
 [ext_resource path="res://Hud.tscn" type="PackedScene" id=4]
@@ -11,8 +11,19 @@ _data = {
 "points": PoolVector2Array( 0, 0, 0, 0, 0.306519, 0.769638, 0, 0, 0, 0, 482.593, 1.69622, 0, 0, 0, 0, 480.276, 721.188, 0, 0, 0, 0, 1.23309, 721.188, 0, 0, 0, 0, 0.306519, 0.769638 )
 }
 
+[sub_resource type="RectangleShape2D" id=2]
+resource_local_to_scene = true
+resource_name = "left"
+extents = Vector2( 239.5, 33.5 )
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 40.25, 362.5 )
+
 [node name="main" type="Node"]
 script = ExtResource( 1 )
+__meta__ = {
+"_edit_vertical_guides_": [  ]
+}
 
 [node name="mob_timer" type="Timer" parent="."]
 wait_time = 0.5
@@ -43,9 +54,31 @@ stream = ExtResource( 5 )
 [node name="ResourcePreloader" type="ResourcePreloader" parent="."]
 
 [node name="pad" parent="." instance=ExtResource( 6 )]
+position = Vector2( 391, 112 )
 
 [node name="PauseMenu" parent="." instance=ExtResource( 7 )]
 visible = false
+
+[node name="TopEdge" type="StaticBody2D" parent="."]
+position = Vector2( -17, -50 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TopEdge"]
+position = Vector2( 258.5, 14.5 )
+shape = SubResource( 2 )
+
+[node name="LeftEdge" type="StaticBody2D" parent="."]
+position = Vector2( -332, 174 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftEdge"]
+position = Vector2( 288.75, 190.5 )
+shape = SubResource( 3 )
+
+[node name="RightEdge" type="StaticBody2D" parent="."]
+position = Vector2( 535, 224 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightEdge"]
+position = Vector2( -13, 144 )
+shape = SubResource( 3 )
 
 [connection signal="timeout" from="mob_timer" to="." method="on_mob_timer_timeout"]
 [connection signal="timeout" from="score_timer" to="." method="on_score_timer_timeout"]
