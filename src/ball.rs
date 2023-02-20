@@ -18,7 +18,7 @@ impl Ball {
     fn new(_owner: &KinematicBody2D) -> Self {
         Ball {
             speed: 1.0,
-            velocity: Vector2::new(0.0, 100.0)
+            velocity: Vector2::new(0.0, -100.0)
         }
     }
 
@@ -27,9 +27,9 @@ impl Ball {
         //godot_print!("_physics_process");     
            
         let collision_info_opt = owner.move_and_collide(self.velocity * delta, true ,true, false);
-        //if let Some(collision_info) = collision_info_opt {
-        //    self.velocity = self.velocity.bounce(unsafe { collision_info.assume_safe() }.normal())
-        //}
+        if let Some(collision_info) = collision_info_opt {
+            self.velocity = self.velocity.bounce(unsafe { collision_info.assume_safe() }.normal())
+        }
     } 
 
     #[method]
