@@ -110,10 +110,9 @@ impl Main {
         if let Some(ball_scene_res) = ball_scene_res.and_then(|s| s.cast::<PackedScene>()) {
             godot_print!("ball Have scene");
             self.ball = ball_scene_res;
-            let ball_scene: Ref<RigidBody2D, _> = instance_scene(&self.ball);
+            let ball_scene: Ref<KinematicBody2D, _> = instance_scene(&self.ball);
             let pos = Vector2::new(100.0, 100.0);
-            
-            ball_scene.set_linear_velocity(Vector2::new(0.0,-200.0));
+            //ball_scene.set_linear_velocity(Vector2::new(0.0,-200.0));
             ball_scene.set_position(pos);
             
             owner.add_child(ball_scene, true);
