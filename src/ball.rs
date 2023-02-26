@@ -1,6 +1,9 @@
-use gdnative::api::{AnimatedSprite, KinematicBody2D};
+use std::fmt::Debug;
+
+use gdnative::api::{AnimatedSprite, KinematicBody2D, PhysicsBody2D, RigidBody2D, StaticBody2D, CollisionShape2D};
 use gdnative::prelude::*;
 use rand::seq::SliceRandom;
+use crate::brick;
 
 #[derive(NativeClass)]
 #[inherit(KinematicBody2D)]
@@ -18,7 +21,7 @@ impl Ball {
     fn new(_owner: &KinematicBody2D) -> Self {
         Ball {
             speed: 1.0,
-            velocity: Vector2::new(0.0, -100.0)
+            velocity: Vector2::new(0.0, -200.0)
         }
     }
 
@@ -27,22 +30,72 @@ impl Ball {
         //godot_print!("_physics_process");     
            
         let collision_info_opt = owner.move_and_collide(self.velocity * delta, true ,true, false);
-        if let Some(collision_info) = collision_info_opt {
-            self.velocity = self.velocity.bounce(unsafe { collision_info.assume_safe() }.normal())
+        if let Some(collision_info_ref) = collision_info_opt {
+            //godot_print!("collision_info collision");     
+            let collision_info = unsafe { collision_info_ref.assume_safe() };
+            if let Some(collider) = collision_info.collider() {
+                //let res = unsafe { collider.assume_safe() };
+                //godot_print!("collider collision {:?}",res.get_class());     
+
+                if let Some(static_body) = unsafe { collider.assume_safe() }.cast::<StaticBody2D>() {
+                    //godot_print!("static body collision");     
+                    if static_body.is_in_group("BrickGroup") {
+                        godot_print!("brick collision");     
+                        if let Some(brick) = unsafe { static_body.assume_shared().assume_unique() }.cast_instance::<brick::Brick>() {
+                            godot_print!("brick brick collision");     
+                        }
+/*
+   let mob_scene = unsafe { mob_scene.into_shared().assume_safe() };
+        owner.add_child(mob_scene, false);
+
+        let mob = mob_scene.cast_instance::<mob::Mob>().unwrap();
+
+*/
+
+                    }
+                    /*if let Some(brick) = staticBody.cast::<brick::Brick>() {
+
+                    }*/
+                }
+            }
+            self.velocity = self.velocity.bounce(collision_info.normal());
         }
     } 
 
     #[method]
     fn _ready(&mut self, #[base] owner: &KinematicBody2D) {
         godot_print!("ball ready");     
-        //let mut rng = rand::thread_rng();
-    
-        /*let animated_sprite = unsafe {
-            owner
-                .get_node_as::<Sprite>("ball")
-                .unwrap()
-        };*/
     }
+
+
+
+    #[method]
+    fn on_body_entered(&self, #[base] owner: &KinematicBody2D, _body: Ref<PhysicsBody2D>) {
+        godot_print!("brick collide");
+        let body = unsafe {_body.assume_safe() };
+        if body.is_in_group("BrickGroup") {
+            godot_print!("brick col");     
+        }
+
+    }   
+
+
+    /*
+    
+    func _on_Ball_area_entered(area):
+	bounce(area)
+	if area.is_in_group("Brick"):
+		var break_p = break_prefab.instance().duplicate()
+		break_p.color = area.get_child(1).modulate
+		break_p.position = area.position
+		get_parent().add_child(break_p)
+		break_p.emitting = true
+		area.queue_free()
+	if area.is_in_group("Bottom"):
+		get_tree().quit()
+
+    
+    */
 
     #[method]
     fn on_visibility_screen_exited(&self, #[base] owner: &KinematicBody2D) {

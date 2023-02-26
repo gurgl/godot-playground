@@ -79,24 +79,24 @@ impl Main {
         if let Some(brick_scene_res) = brick_scene_res.and_then(|s| s.cast::<PackedScene>()) {
             godot_print!("brick Have scene 1");
             //let brick = brick_scene_res;
-            godot_print!("-3");
             let brick_scene: Ref<StaticBody2D, _> = instance_scene(&brick_scene_res);
             //let brick_scene2 =  brick_scene.duplicate();
-            godot_print!("-2");
-            let pos = Vector2::new(100.0, 50.0);
-            godot_print!("-1");
-            brick_scene.set_position(pos);
-            godot_print!("0");
+            let pos_top_left = Vector2::new(50.0, 50.0);
+            //brick_scene.set_position(pos);
             let brick_scene_s = brick_scene.into_shared();
-            godot_print!("1");
             self.bricks.push(brick_scene_s);
-            godot_print!("2");
             let brick_scene = unsafe { brick_scene_s.assume_safe() };
-            godot_print!("3");
-            owner.add_child(brick_scene, true);
-        
+            let bricks = unsafe { owner.get_node_as::<Node2D>("bricks").unwrap() };
+            for n in 1..4 {
+                let dup = brick_scene.duplicate(15).unwrap();
+                let r = unsafe { dup.assume_safe() }.cast::<StaticBody2D>().unwrap();
+                let pos = Vector2::new(pos_top_left.x + 100.0 * (n as f32), 100.0);
+                r.set_position(pos);
+                bricks.add_child(dup, true);
+            }
             
-            godot_print!("brick loaded {:?}",pos);
+        
+            godot_print!("brick loaded {:?}",pos_top_left);
             
         } else {
             godot_print!("StarWorldLink could not load ship_link scene");
@@ -148,86 +148,11 @@ impl Main {
             .unwrap_or_else(|| godot_print!("Unable to get hud"));
     }
 
-    /*
-    #[method]
-    fn on_mob_timer_timeout(&self, #[base] owner: &Node) {
-        let mob_spawn_location = unsafe {
-            owner
-                .get_node_as::<PathFollow2D>("mob_path/mob_spawn_locations")
-                .unwrap()
-        };
-
-        let mob_scene: Ref<RigidBody2D, _> = instance_scene(&self.mob);
-
-        let mut rng = rand::thread_rng();
-        let offset = rng.gen_range(std::u32::MIN..std::u32::MAX);
-
-        mob_spawn_location.set_offset(offset.into());
-
-        let mut direction = mob_spawn_location.rotation() + PI / 2.0;
-
-        mob_scene.set_position(mob_spawn_location.position());
-
-        direction += rng.gen_range(-PI / 4.0..PI / 4.0);
-        mob_scene.set_rotation(direction);
-        let d = direction as f32;
-
-        let mob_scene = unsafe { mob_scene.into_shared().assume_safe() };
-        owner.add_child(mob_scene, false);
-
-        let mob = mob_scene.cast_instance::<mob::Mob>().unwrap();
-
-        //godot_print!("on_mob_timer_timeout");
-
-        mob.map(|x, mob_owner| {
-            mob_owner
-                .set_linear_velocity(Vector2::new(rng.gen_range(x.min_speed..x.max_speed), 0.0));
-
-            mob_owner.set_linear_velocity(mob_owner.linear_velocity().rotated(d));
-
-            let hud = unsafe { owner.get_node_as_instance::<hud::Hud>("hud").unwrap() };
-            hud.map(|_, o| {
-                o.connect(
-                    "start_game",
-                    mob_owner,
-                    "on_start_game",
-                    VariantArray::new_shared(),
-                    0,
-                )
-                .unwrap();
-            })
-            .unwrap();
-        })
-        .unwrap();
-    }
- */
-
-//    #[method]
-//    fn _input(&self, #[base] owner: &Node, event: Ref<InputEvent>) {
-//        //if let Some(brick_scene_res) = brick_scene_res.and_then(|s| s.cast::<PackedScene>()) {
-//        //owner.get_tree().map( paused = true
-//        //godot_print!("Input");
-//        
-//        //if let Some(keyEvent) = unsafe { event.assume_safe() }.cast_instance::<InputEventKey>() {
-//        //
-//        //}
-//        //()
-//        if(unsafe { event.assume_safe() }.is_action_pressed("game_pause",false,false)) {
-//            godot_print!("Pause");
-//            owner.get_tree().map(|x| {
-//                let tree = unsafe { x.assume_safe() };
-//                let is_paused = tree.is_paused();
-//                tree.set_pause(!is_paused);
-//                ()
-//            });
-//
-//        }
-//            
-//    }
+   
 }
 
 /// Root here is needs to be the same type (or a parent type) of the node that you put in the child
-///   scene as the root. For instance Spatial is used for this example.
+///   scene as the root. For instance Spatial is used for this example. 
 fn instance_scene<Root>(scene: &Ref<PackedScene, Shared>) -> Ref<Root, Unique>
 where
     Root: gdnative::object::GodotObject<Memory = ManuallyManaged> + SubClass<Node>,

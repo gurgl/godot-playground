@@ -1,9 +1,9 @@
-use gdnative::api::{AnimatedSprite, Area2D};
+use gdnative::api::{AnimatedSprite, StaticBody2D, PhysicsBody2D};
 use gdnative::prelude::*;
 use rand::seq::SliceRandom;
 
 #[derive(NativeClass)]
-#[inherit(Area2D)]
+#[inherit(StaticBody2D)]
 #[user_data(user_data::MutexData<Brick>)]
 pub struct Brick {
     
@@ -30,20 +30,21 @@ const MOB_TYPES: [BrickType; 3] = [BrickType::Walk, BrickType::Swim, BrickType::
 
 #[methods]
 impl Brick {
-    fn new(_owner: &Area2D) -> Self {
+    fn new(_owner: &StaticBody2D) -> Self {
         Brick {
             
         }
     }
 
     #[method]
-    fn _ready(&mut self, #[base] owner: &Area2D) {
+    fn _ready(&mut self, #[base] owner: &StaticBody2D) {
         
     }
 
 
+
     #[method]
-    fn on_start_game(&self, #[base] owner: &Area2D) {
+    fn on_start_game(&self, #[base] owner: &StaticBody2D) {
         godot_print!("start");
         unsafe {
             owner.assume_unique().queue_free();
