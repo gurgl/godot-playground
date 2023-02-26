@@ -49,11 +49,9 @@ impl PlayerPad {
             //godot_print!("left");
             velocity.x -= 1.0
         }
-        
 
         if velocity.length() > 0.0 {
             velocity = velocity.normalized() * self.speed;
-
         }
 
         let change = velocity * delta;
@@ -63,6 +61,13 @@ impl PlayerPad {
             position.y.max(0.0).min(self.screen_size.y),
         );
         owner.set_global_position(position);
+    }
+
+
+    #[method]
+    pub fn move_pad(&self, #[base] owner: &KinematicBody2D, xpos:f32) {
+        let old_pos = owner.global_position();
+        owner.set_position(Vector2::new(xpos, old_pos.y));
     }
 
     #[method]
@@ -97,4 +102,6 @@ impl PlayerPad {
 
         collision_shape.set_disabled(false);
     }
+
+
 }

@@ -3,6 +3,7 @@ use crate::mob;
 use crate::ball;
 use crate::brick;
 use crate::player_pad;
+use gdnative::api::InputEventMouseMotion;
 use gdnative::api::ResourcePreloader;
 use gdnative::api::{PathFollow2D, Position2D, StaticBody2D, RigidBody2D, AudioStreamPlayer, InputEventKey};
 use gdnative::prelude::*;
@@ -16,6 +17,7 @@ pub struct Main {
     #[property]
     ball: Ref<PackedScene>,
     bricks : Vec<Ref<StaticBody2D>>,
+    mousePos : Option<Vector2>,
     score: i64,
 }
 
@@ -26,6 +28,7 @@ impl Main {
         Main {
             ball: PackedScene::new().into_shared(),
             bricks: Vec::new(),
+            mousePos: None, 
             score: 0,
         }
     }
@@ -148,6 +151,39 @@ impl Main {
             .unwrap_or_else(|| godot_print!("Unable to get hud"));
     }
 
+
+    #[method]
+    fn _input(&mut self, #[base] owner: &Node, _event: Ref<InputEvent>) {
+        //godot_print!("input");
+        if let Some(mouseEvent) = _event.cast::<InputEventMouseMotion>() {
+            let pos = unsafe { mouseEvent.assume_safe() }.position();
+            //godot_print!("mouse");
+            if let Some(prevPos) = self.mousePos {
+                //godot_print!("upd");
+                let delta = prevPos - pos;
+                //let mut foo = self.mousePos;
+                //foo = Some(pos);
+                
+                //godot_print!("delta {} and {}", delta.x, pos.x);
+                
+            } else {
+                
+            }
+
+            let player = unsafe {
+                owner
+                    .get_node_as_instance::<player_pad::PlayerPad>("pad")
+                    .unwrap()
+            };
+
+            player.map(|x, o| x.move_pad(&o, pos.x))
+            .ok()
+            .unwrap_or_else(|| godot_print!("Unable to get player"));
+
+            self.mousePos = Some(pos);
+            
+        }
+    }
    
 }
 
