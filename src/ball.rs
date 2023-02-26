@@ -34,28 +34,17 @@ impl Ball {
             //godot_print!("collision_info collision");     
             let collision_info = unsafe { collision_info_ref.assume_safe() };
             if let Some(collider) = collision_info.collider() {
-                //let res = unsafe { collider.assume_safe() };
                 //godot_print!("collider collision {:?}",res.get_class());     
-
                 if let Some(static_body) = unsafe { collider.assume_safe() }.cast::<StaticBody2D>() {
                     //godot_print!("static body collision");     
                     if static_body.is_in_group("BrickGroup") {
                         godot_print!("brick collision");     
                         if let Some(brick) = unsafe { static_body.assume_shared().assume_unique() }.cast_instance::<brick::Brick>() {
                             godot_print!("brick brick collision");     
+                            brick.map(|x,_| x.hit(static_body.as_ref()));
+                            ()
                         }
-/*
-   let mob_scene = unsafe { mob_scene.into_shared().assume_safe() };
-        owner.add_child(mob_scene, false);
-
-        let mob = mob_scene.cast_instance::<mob::Mob>().unwrap();
-
-*/
-
                     }
-                    /*if let Some(brick) = staticBody.cast::<brick::Brick>() {
-
-                    }*/
                 }
             }
             self.velocity = self.velocity.bounce(collision_info.normal());

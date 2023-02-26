@@ -50,4 +50,11 @@ impl Brick {
             owner.assume_unique().queue_free();
         }
     }
+
+    #[method]
+    pub fn hit(&self, #[base] owner: &StaticBody2D) {
+        unsafe {
+            owner.assume_unique().queue_free();
+        }
+    }
 }
