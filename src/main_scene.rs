@@ -11,7 +11,7 @@ use rand::*;
 use std::f64::consts::PI;
 
 #[derive(NativeClass)]
-#[inherit(Node)]
+#[inherit(Node2D)]
 #[user_data(user_data::LocalCellData<Main>)]
 #[register_with(Self::register_main)]
 pub struct Main {
@@ -24,7 +24,7 @@ pub struct Main {
 
 #[methods]
 impl Main {
-    fn new(_owner: &Node) -> Self {
+    fn new(_owner: &Node2D) -> Self {
         godot_print!("Main::new");
         Main {
             ball: PackedScene::new().into_shared(),
@@ -36,22 +36,22 @@ impl Main {
 
     fn register_main(builder: &ClassBuilder<Self>) {
         godot_print!("register main");
-        builder.signal("game_over").done();
+        //builder.signal("game_over").done();
     }
 
     #[method]
-    fn on_game_over(&self, #[base] owner: &Node) {
+    fn on_game_over(&self, #[base] owner: &Node2D) {
         godot_print!("Game over received");
         self.game_over(owner)
     }
     #[method]
-    fn _on_ball_game_over_ball(&self, #[base] owner: &Node) {
+    fn _on_ball_game_over_ball(&self, #[base] owner: &Node2D) {
         godot_print!("Game over received");
         self.game_over(owner)
     }
 
     #[method]
-    fn game_over(&self, #[base] owner: &Node) {
+    fn game_over(&self, #[base] owner: &Node2D) {
 
         let score_timer = unsafe { owner.get_node_as::<Timer>("score_timer").unwrap() };
         //let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
@@ -69,7 +69,7 @@ impl Main {
     }
 
     #[method]
-    fn new_game(&mut self, #[base] owner: &Node) {
+    fn new_game(&mut self, #[base] owner: &Node2D) {
         godot_print!("new_game");
         let music = unsafe { owner.get_node_as::<AudioStreamPlayer>("Music").unwrap() };
         music.play(0.0);
@@ -134,20 +134,26 @@ impl Main {
             let pos = Vector2::new(100.0, 100.0);
             //ball_scene.set_linear_velocity(Vector2::new(0.0,-200.0));
             ball_scene.set_position(pos);
+                        
             
-            
-            //let ball = ball_scene.cast_instance::<ball::Ball>().unwrap();
-            
-            //ball.assume_safe().connect("game_over", owner, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap();
-            
-            
-            //ball.map(|_,o| {
-            //    o.connect("game_over", owner, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap()
-            //}).unwrap(); 
+            //ball.connect("game_over", owner, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap();
+            let res = unsafe { owner.assume_shared() };
+            //self.map(|_,mo| {
+           
             //ball_scene.map(|_,b| 
             //    b.connect("game_over", self, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap() 
             //);
+            let ball_scene2 = unsafe { ball_scene.assume_unique() };
             owner.add_child(ball_scene, true);
+            
+            let ball = ball_scene2.cast_instance::<ball::Ball>().unwrap();
+            
+            ball.map(|_,o| {
+                
+                o.connect("game_over", res, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap()
+        //    
+        //    }).unwrap()
+        }).unwrap(); 
             godot_print!("Ball loaded {:?}",pos);
         } else {
             godot_print!("StarWorldLink could not load ship_link scene");
@@ -163,7 +169,7 @@ impl Main {
     }
 
     #[method]
-    fn on_start_timer_timeout(&self, #[base] owner: &Node) {
+    fn on_start_timer_timeout(&self, #[base] owner: &Node2D) {
         //let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
         let score_timer = unsafe { owner.get_node_as::<Timer>("score_timer").unwrap() };
         //mob_timer.start(0.0);
@@ -171,7 +177,7 @@ impl Main {
     }
 
     #[method]
-    fn on_score_timer_timeout(&mut self, #[base] owner: &Node) {
+    fn on_score_timer_timeout(&mut self, #[base] owner: &Node2D) {
         self.score += 1;
 
         let hud = unsafe { owner.get_node_as_instance::<hud::Hud>("hud").unwrap() };
@@ -182,7 +188,7 @@ impl Main {
 
 
     #[method]
-    fn _input(&mut self, #[base] owner: &Node, _event: Ref<InputEvent>) {
+    fn _input(&mut self, #[base] owner: &Node2D, _event: Ref<InputEvent>) {
         //godot_print!("input");
         if let Some(mouseEvent) = _event.cast::<InputEventMouseMotion>() {
             let pos = unsafe { mouseEvent.assume_safe() }.position();

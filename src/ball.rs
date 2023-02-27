@@ -29,7 +29,7 @@ impl Ball {
 
     fn register_ball(builder: &ClassBuilder<Self>) {
         godot_print!("register ball");
-        builder.signal("game_over_ball").done();
+        builder.signal("game_over").done();
     }
 
     #[method]
