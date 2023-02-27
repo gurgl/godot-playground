@@ -8,6 +8,7 @@ use crate::brick;
 #[derive(NativeClass)]
 #[inherit(KinematicBody2D)]
 #[user_data(user_data::MutexData<Ball>)]
+#[register_with(Self::register_ball)]
 pub struct Ball {
     #[property(default = 150.0)]
     pub speed: f32,
@@ -23,6 +24,12 @@ impl Ball {
             speed: 1.0,
             velocity: Vector2::new(0.0, -200.0)
         }
+    }
+
+
+    fn register_ball(builder: &ClassBuilder<Self>) {
+        godot_print!("register ball");
+        builder.signal("game_over_ball").done();
     }
 
     #[method]
@@ -44,6 +51,12 @@ impl Ball {
                             brick.map(|x,_| x.hit(static_body.as_ref()));
                             ()
                         }
+                    } else if static_body.name().eq(&GodotString::from_str("BottomEdge")) {
+                        godot_print!("Game over");
+                        let root = unsafe { owner.get_parent().unwrap().assume_safe() };
+                        owner.emit_signal(GodotString::from_str("game_over"), &[]);
+                        //SignalBuilder::new("game_over")
+                        return ()
                     }
                 }
             }

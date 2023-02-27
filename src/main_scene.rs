@@ -13,6 +13,7 @@ use std::f64::consts::PI;
 #[derive(NativeClass)]
 #[inherit(Node)]
 #[user_data(user_data::LocalCellData<Main>)]
+#[register_with(Self::register_main)]
 pub struct Main {
     #[property]
     ball: Ref<PackedScene>,
@@ -33,8 +34,25 @@ impl Main {
         }
     }
 
+    fn register_main(builder: &ClassBuilder<Self>) {
+        godot_print!("register main");
+        builder.signal("game_over").done();
+    }
+
+    #[method]
+    fn on_game_over(&self, #[base] owner: &Node) {
+        godot_print!("Game over received");
+        self.game_over(owner)
+    }
+    #[method]
+    fn _on_ball_game_over_ball(&self, #[base] owner: &Node) {
+        godot_print!("Game over received");
+        self.game_over(owner)
+    }
+
     #[method]
     fn game_over(&self, #[base] owner: &Node) {
+
         let score_timer = unsafe { owner.get_node_as::<Timer>("score_timer").unwrap() };
         //let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
 
@@ -97,7 +115,6 @@ impl Main {
                 r.set_position(pos);
                 bricks.add_child(dup, true);
             }
-            
         
             godot_print!("brick loaded {:?}",pos_top_left);
             
@@ -118,6 +135,18 @@ impl Main {
             //ball_scene.set_linear_velocity(Vector2::new(0.0,-200.0));
             ball_scene.set_position(pos);
             
+            
+            //let ball = ball_scene.cast_instance::<ball::Ball>().unwrap();
+            
+            //ball.assume_safe().connect("game_over", owner, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap();
+            
+            
+            //ball.map(|_,o| {
+            //    o.connect("game_over", owner, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap()
+            //}).unwrap(); 
+            //ball_scene.map(|_,b| 
+            //    b.connect("game_over", self, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap() 
+            //);
             owner.add_child(ball_scene, true);
             godot_print!("Ball loaded {:?}",pos);
         } else {
