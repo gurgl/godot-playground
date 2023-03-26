@@ -36,7 +36,7 @@ impl Main {
 
     fn register_main(builder: &ClassBuilder<Self>) {
         godot_print!("register main");
-        //builder.signal("game_over").done();
+        builder.signal("tear_down").done();
     }
 
     #[method]
@@ -44,15 +44,15 @@ impl Main {
         godot_print!("Game over received");
         self.game_over(owner)
     }
-    #[method]
-    fn _on_ball_game_over_ball(&self, #[base] owner: &Node2D) {
-        godot_print!("Game over received");
-        self.game_over(owner)
-    }
+    //#[method]
+    //fn _on_ball_game_over_ball(&self, #[base] owner: &Node2D) {
+    //    godot_print!("Game over received");
+    //    self.game_over(owner)
+    //}
 
     #[method]
     fn game_over(&self, #[base] owner: &Node2D) {
-
+        godot_print!("main scn game over");
         let score_timer = unsafe { owner.get_node_as::<Timer>("score_timer").unwrap() };
         //let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
 
@@ -61,6 +61,12 @@ impl Main {
 
         score_timer.stop();
         //mob_timer.stop();
+
+        //let ball = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap() };
+
+        //ball.map(|b,o| b.on_game_over(&o)).unwrap();
+
+        owner.emit_signal("tear_down", &[]);
 
         let hud = unsafe { owner.get_node_as_instance::<hud::Hud>("hud").unwrap() };
         hud.map(|x, o| x.show_game_over(&o))
@@ -99,11 +105,11 @@ impl Main {
 
         if let Some(brick_scene_res) = brick_scene_res.and_then(|s| s.cast::<PackedScene>()) {
             godot_print!("brick Have scene 1");
-            //let brick = brick_scene_res;
+            
             let brick_scene: Ref<StaticBody2D, _> = instance_scene(&brick_scene_res);
-            //let brick_scene2 =  brick_scene.duplicate();
+            
             let pos_top_left = Vector2::new(50.0, 50.0);
-            //brick_scene.set_position(pos);
+            
             let brick_scene_s = brick_scene.into_shared();
             self.bricks.push(brick_scene_s);
             let brick_scene = unsafe { brick_scene_s.assume_safe() };
@@ -132,28 +138,21 @@ impl Main {
             self.ball = ball_scene_res;
             let ball_scene: Ref<KinematicBody2D, _> = instance_scene(&self.ball);
             let pos = Vector2::new(100.0, 100.0);
-            //ball_scene.set_linear_velocity(Vector2::new(0.0,-200.0));
             ball_scene.set_position(pos);
-                        
             
-            //ball.connect("game_over", owner, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap();
             let res = unsafe { owner.assume_shared() };
-            //self.map(|_,mo| {
-           
-            //ball_scene.map(|_,b| 
-            //    b.connect("game_over", self, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap() 
-            //);
+            
             let ball_scene2 = unsafe { ball_scene.assume_unique() };
             owner.add_child(ball_scene, true);
             
             let ball = ball_scene2.cast_instance::<ball::Ball>().unwrap();
             
             ball.map(|_,o| {
-                
-                o.connect("game_over", res, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap()
-        //    
-        //    }).unwrap()
-        }).unwrap(); 
+                o.connect("game_over", res, "game_over",VariantArray::new_shared(),0).unwrap(); 
+                //unsafe { res.assume_safe() }.connect("game_over", o, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap(); 
+                //res.map(|_,o2| o2.connect("tear_down", o, "game_over",VariantArray::new_shared(),0).unwrap()
+            }).unwrap(); 
+        
             godot_print!("Ball loaded {:?}",pos);
         } else {
             godot_print!("StarWorldLink could not load ship_link scene");
@@ -169,10 +168,8 @@ impl Main {
     }
 
     #[method]
-    fn on_start_timer_timeout(&self, #[base] owner: &Node2D) {
-        //let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
+    fn on_start_timer_timeout(&self, #[base] owner: &Node2D) {        
         let score_timer = unsafe { owner.get_node_as::<Timer>("score_timer").unwrap() };
-        //mob_timer.start(0.0);
         score_timer.start(0.0);
     }
 

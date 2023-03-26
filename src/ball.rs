@@ -113,4 +113,14 @@ impl Ball {
             owner.assume_unique().queue_free();
         }
     }
+
+    #[method]
+    pub fn _on_Ball_game_over(&self, #[base] owner: &KinematicBody2D) {
+        godot_print!("ball game over");
+        //unsafe {
+        //    owner.assume_unique().queue_free();
+        //}
+    }
+
+
 }
