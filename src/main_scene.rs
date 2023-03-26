@@ -66,7 +66,16 @@ impl Main {
 
         //ball.map(|b,o| b.on_game_over(&o)).unwrap();
 
-        owner.emit_signal("tear_down", &[]);
+        //owner.emit_signal("tear_down", &[]);
+
+        let ball = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap() };
+        
+        
+        //ball.map(|x, o| o.terar
+        owner.remove_child(ball);
+
+        let ball2 = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap() };
+        ball2.map(|x, o| o.queue_free());
 
         let hud = unsafe { owner.get_node_as_instance::<hud::Hud>("hud").unwrap() };
         hud.map(|x, o| x.show_game_over(&o))
@@ -138,6 +147,7 @@ impl Main {
             self.ball = ball_scene_res;
             let ball_scene: Ref<KinematicBody2D, _> = instance_scene(&self.ball);
             let pos = Vector2::new(100.0, 100.0);
+            ball_scene.set_name("ball");
             ball_scene.set_position(pos);
             
             let res = unsafe { owner.assume_shared() };
