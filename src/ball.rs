@@ -7,7 +7,8 @@ use crate::brick;
 
 #[derive(NativeClass)]
 #[inherit(KinematicBody2D)]
-#[user_data(user_data::MutexData<Ball>)]
+//#[user_data(user_data::MutexData<Ball>)]
+//#[user_data(user_data::LocalCellData<Ball>)]
 #[register_with(Self::register_ball)]
 pub struct Ball {
     #[property(default = 150.0)]
@@ -55,7 +56,8 @@ impl Ball {
                         owner.set_process(false);
                         owner.set_sync_to_physics(false);
                         owner.emit_signal(GodotString::from_str("game_over"), &[]);
-                        unsafe { owner.assume_unique().queue_free() };
+                        //unsafe { owner.assume_unique().queue_free() };
+                        //self.tear_down(&owner);
                         return ()
                     }
                 }
@@ -80,13 +82,14 @@ impl Ball {
     }   
 
 
-    #[method]
-    pub fn tear_down(&self, #[base] _owner: &KinematicBody2D) {
+    //#[method]
+    //pub fn tear_down(&self, #[base] owner: &KinematicBody2D) {
+    pub fn tear_down(&self, owner: TRef<KinematicBody2D>) {
         godot_print!("ball game over");
-        //unsafe {
+        unsafe {
             //owner.assume_unique().hide();
-            //owner.assume_unique().queue_free();
-        //}
+            owner.assume_unique().queue_free();
+        }
         //owner.queue_free();
     }
 

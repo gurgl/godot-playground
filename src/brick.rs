@@ -4,7 +4,7 @@ use rand::seq::SliceRandom;
 
 #[derive(NativeClass)]
 #[inherit(StaticBody2D)]
-#[user_data(user_data::MutexData<Brick>)]
+//#[user_data(user_data::MutexData<Brick>)]
 pub struct Brick {
     
 }

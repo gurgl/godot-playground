@@ -1,3 +1,4 @@
+use crate::ball::Ball;
 use crate::hud;
 use crate::ball;
 use crate::brick;
@@ -55,10 +56,17 @@ impl Main {
         score_timer.stop();
         
         
-        //let ball = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap().assume_safe() };
-
+        //let ball = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap() };
+        
         //ball.map(|x, o| x.tear_down(&o))
         //    .ok().unwrap_or_else(|| godot_print!("Unable to get ball"));
+
+        if let Some(ball) = unsafe { owner.get_node_as_instance::<ball::Ball>("ball")} {
+            godot_print!("Found ball");
+            ball.map(|x, o| x.tear_down(o)).ok().unwrap_or_else(|| godot_print!("Unable to get ball"));                        
+        } else {
+            godot_print!("No ball");
+        }
 
         
         owner.emit_signal("tear_down", &[]);
@@ -137,7 +145,7 @@ impl Main {
            
             let ball_scene: Ref<KinematicBody2D, _> = instance_scene(&ball_scene_res_ok);
             let pos = Vector2::new(100.0, 100.0);
-            ball_scene.set_name("ball");
+            ball_scene.set_name("ball");            
             ball_scene.set_position(pos);
             
             let res = unsafe { owner.assume_shared() };
@@ -149,7 +157,7 @@ impl Main {
             
 
             ball.map(|_,o| {
-                o.connect("game_over", res, "game_over",VariantArray::new_shared(),0).unwrap(); 
+                o.connect("game_over", res, "game_over",VariantArray::new_shared(),Object::CONNECT_DEFERRED).unwrap(); 
                 //unsafe { res.assume_safe() }.connect("game_over", o, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap(); 
                 //res.map(|_,o2| o2.connect("tear_down", o, "game_over",VariantArray::new_shared(),0).unwrap()
             }).unwrap(); 

@@ -5,7 +5,7 @@ use gdnative::prelude::{Ref};
 /// The player "class"
 #[derive(NativeClass)]
 #[inherit(KinematicBody2D)]
-#[user_data(user_data::MutexData<PlayerPad>)]
+//#[user_data(user_data::MutexData<PlayerPad>)]
 #[register_with(Self::register_player)]
 pub struct PlayerPad {
     #[property(default = 400.0)]
