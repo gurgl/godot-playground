@@ -1,5 +1,4 @@
 use crate::hud;
-use crate::mob;
 use crate::ball;
 use crate::brick;
 use crate::player_pad;
@@ -16,7 +15,6 @@ use std::f64::consts::PI;
 #[register_with(Self::register_main)]
 pub struct Main {
     #[property]
-    ball: Ref<PackedScene>,
     bricks : Vec<Ref<StaticBody2D>>,
     mousePos : Option<Vector2>,
     score: i64,
@@ -27,7 +25,7 @@ impl Main {
     fn new(_owner: &Node2D) -> Self {
         godot_print!("Main::new");
         Main {
-            ball: PackedScene::new().into_shared(),
+            
             bricks: Vec::new(),
             mousePos: None, 
             score: 0,
@@ -44,43 +42,35 @@ impl Main {
         godot_print!("Game over received");
         self.game_over(owner)
     }
-    //#[method]
-    //fn _on_ball_game_over_ball(&self, #[base] owner: &Node2D) {
-    //    godot_print!("Game over received");
-    //    self.game_over(owner)
-    //}
+    
 
     #[method]
     fn game_over(&self, #[base] owner: &Node2D) {
-        godot_print!("main scn game over");
+        godot_print!("main scn game over - start");
         let score_timer = unsafe { owner.get_node_as::<Timer>("score_timer").unwrap() };
-        //let mob_timer = unsafe { owner.get_node_as::<Timer>("mob_timer").unwrap() };
-
+        
         let music = unsafe { owner.get_node_as::<AudioStreamPlayer>("Music").unwrap() };
         music.stop();
 
         score_timer.stop();
-        //mob_timer.stop();
-
-        //let ball = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap() };
-
-        //ball.map(|b,o| b.on_game_over(&o)).unwrap();
-
-        //owner.emit_signal("tear_down", &[]);
-
-        let ball = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap() };
         
         
-        //ball.map(|x, o| o.terar
-        owner.remove_child(ball);
+        //let ball = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap().assume_safe() };
 
-        let ball2 = unsafe { owner.get_node_as_instance::<ball::Ball>("ball").unwrap() };
-        ball2.map(|x, o| o.queue_free());
+        //ball.map(|x, o| x.tear_down(&o))
+        //    .ok().unwrap_or_else(|| godot_print!("Unable to get ball"));
+
+        
+        owner.emit_signal("tear_down", &[]);
 
         let hud = unsafe { owner.get_node_as_instance::<hud::Hud>("hud").unwrap() };
         hud.map(|x, o| x.show_game_over(&o))
             .ok()
             .unwrap_or_else(|| godot_print!("Unable to get hud"));
+
+        
+
+        godot_print!("main scn game over - end");
     }
 
     #[method]
@@ -142,10 +132,10 @@ impl Main {
             GodotString::from_str("res://breakout/Ball.tscn"),
             GodotString::from_str("PackedScene"), false);
 
-        if let Some(ball_scene_res) = ball_scene_res.and_then(|s| s.cast::<PackedScene>()) {
+        if let Some(ball_scene_res_ok) = ball_scene_res.and_then(|s| s.cast::<PackedScene>()) {
             godot_print!("ball Have scene");
-            self.ball = ball_scene_res;
-            let ball_scene: Ref<KinematicBody2D, _> = instance_scene(&self.ball);
+           
+            let ball_scene: Ref<KinematicBody2D, _> = instance_scene(&ball_scene_res_ok);
             let pos = Vector2::new(100.0, 100.0);
             ball_scene.set_name("ball");
             ball_scene.set_position(pos);
@@ -157,6 +147,7 @@ impl Main {
             
             let ball = ball_scene2.cast_instance::<ball::Ball>().unwrap();
             
+
             ball.map(|_,o| {
                 o.connect("game_over", res, "game_over",VariantArray::new_shared(),0).unwrap(); 
                 //unsafe { res.assume_safe() }.connect("game_over", o, GodotString::from_str("game_over"),VariantArray::new_shared(),0).unwrap(); 
@@ -203,11 +194,7 @@ impl Main {
             if let Some(prevPos) = self.mousePos {
                 //godot_print!("upd");
                 let delta = prevPos - pos;
-                //let mut foo = self.mousePos;
-                //foo = Some(pos);
-                
-                //godot_print!("delta {} and {}", delta.x, pos.x);
-                
+              
             } else {
                 
             }

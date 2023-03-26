@@ -45,17 +45,14 @@ let
 
   gdnative = pkgs.rustPlatform.buildRustPackage rec {
         pname = "gdnative";
-        version = "0.10.1";
+        version = "0.10.2";
 
         src = pkgs.fetchFromGitHub {
           owner = "godot-rust";
           repo = pname;
-          # hash = "sha256-wA6i8IUhY9pABuQze8T2CQSnNjp42xLWzCNqnHzNoi8=";
-          # sha256 = "1a9inv2mx6arfh97x5z1ap82hqiszli5y7xdwrc594frkjwmc0ng";
-          sha256 = "wA6i8IUhY9pABuQze8T2CQSnNjp42xLWzCNqnHzNoi8=";
-          # sha256 = pkgs.lib.fakeSha256;
+          sha256 = "wA6i8IUhY9pABuQze8T2CQSnNjp42xLWzCNqnHzNoi8=";          
           rev = version;
-          # rev = "ee1ceb28341e78e0bcb20b6969efaa49a254c40a";
+         
         };
         LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
         BINDGEN_EXTRA_CLANG_ARGS = with pkgs; ''
@@ -68,14 +65,9 @@ let
         RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
         RUST_BACKTRACE=1;
         checkFlags="--skip ui_tests";
-        # cargoSha256 = pkgs.lib.fakeSha256;
-        # cargoSha256 = "sha256-wA6i8IUhY9pABuQze8T2CQSnNjp42xLWzCNqnHzNoi8=";
+      
         cargoHash = pkgs.lib.fakeHash;
-        # cargoHash = "sha256-zwJWuZzZkVRY5q0fXyL9OmIo0FXhl34SdFmZXsW2Mak=";
-        #cargoPatches = [
-        #    # a patch file to add/update Cargo.lock in the source code
-        #    ./add-Cargo.lock.patch
-        #  ];
+       
         postPatch = ''
           cp ${./../GDNative.Cargo.lock} Cargo.lock
         '';

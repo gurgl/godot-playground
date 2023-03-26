@@ -34,7 +34,6 @@ impl Ball {
 
     #[method]
     fn _physics_process(&mut self, #[base] owner: &KinematicBody2D, delta:f32) {
-        //godot_print!("_physics_process");     
            
         let collision_info_opt = owner.move_and_collide(self.velocity * delta, true ,true, false);
         if let Some(collision_info_ref) = collision_info_opt {
@@ -52,10 +51,11 @@ impl Ball {
                             ()
                         }
                     } else if static_body.name().eq(&GodotString::from_str("BottomEdge")) {
-                        godot_print!("Game over");
-                        let root = unsafe { owner.get_parent().unwrap().assume_safe() };
+                        godot_print!("ball coll game over");
+                        owner.set_process(false);
+                        owner.set_sync_to_physics(false);
                         owner.emit_signal(GodotString::from_str("game_over"), &[]);
-                        //SignalBuilder::new("game_over")
+                        unsafe { owner.assume_unique().queue_free() };
                         return ()
                     }
                 }
@@ -69,8 +69,6 @@ impl Ball {
         godot_print!("ball ready");     
     }
 
-
-
     #[method]
     fn on_body_entered(&self, #[base] owner: &KinematicBody2D, _body: Ref<PhysicsBody2D>) {
         godot_print!("brick collide");
@@ -82,44 +80,14 @@ impl Ball {
     }   
 
 
-    /*
-    
-    func _on_Ball_area_entered(area):
-	bounce(area)
-	if area.is_in_group("Brick"):
-		var break_p = break_prefab.instance().duplicate()
-		break_p.color = area.get_child(1).modulate
-		break_p.position = area.position
-		get_parent().add_child(break_p)
-		break_p.emitting = true
-		area.queue_free()
-	if area.is_in_group("Bottom"):
-		get_tree().quit()
-
-    
-    */
-
     #[method]
-    fn on_visibility_screen_exited(&self, #[base] owner: &KinematicBody2D) {
-        unsafe {
-            owner.assume_unique().queue_free();
-        }
-    }
-
-    #[method]
-    fn on_start_game(&self, #[base] owner: &KinematicBody2D) {
-        godot_print!("ball start");
-        unsafe {
-            owner.assume_unique().queue_free();
-        }
-    }
-
-    #[method]
-    pub fn tear_down(&self, #[base] owner: &KinematicBody2D) {
+    pub fn tear_down(&self, #[base] _owner: &KinematicBody2D) {
         godot_print!("ball game over");
-        unsafe {
-            owner.assume_unique().queue_free();
-        }
+        //unsafe {
+            //owner.assume_unique().hide();
+            //owner.assume_unique().queue_free();
+        //}
+        //owner.queue_free();
     }
 
 
