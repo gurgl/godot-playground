@@ -39,14 +39,14 @@ impl Main {
     }
 
     #[method]
-    fn on_game_over(&self, #[base] owner: &Node2D) {
+    fn on_game_over(&mut self, #[base] owner: &Node2D) {
         godot_print!("Game over received");
         self.game_over(owner)
     }
     
 
     #[method]
-    fn game_over(&self, #[base] owner: &Node2D) {
+    fn game_over(&mut self, #[base] owner: &Node2D) {
         godot_print!("main scn game over - start");
         let score_timer = unsafe { owner.get_node_as::<Timer>("score_timer").unwrap() };
         
@@ -64,6 +64,39 @@ impl Main {
         if let Some(ball) = unsafe { owner.get_node_as_instance::<ball::Ball>("ball")} {
             godot_print!("Found ball");
             ball.map(|x, o| x.tear_down(o)).ok().unwrap_or_else(|| godot_print!("Unable to get ball"));                        
+        } else {
+            godot_print!("No ball");
+        }
+
+        if let Some(bricks) = unsafe { owner.get_node_as::<Node2D>("bricks")} {
+            godot_print!("Found ball");
+            
+            for child in bricks.get_children().iter() {
+                if let Ok(child) = child.try_to_object::<Node2D>() {
+                    unsafe { child.assume_unique().queue_free() };      
+                    // Do stuff only if it can be successfully converted to a spatial.
+                }
+            }
+            //bricks.get_children().iter()
+            //    .filter_map(|x| x.try_to_object().ok() )
+            //    .filter_map(|x:Ref<GodotObject,Shared>| x.try_cast::<Node2D>().ok())
+            //    ;
+            //    //.for_each(|x| unsafe { x.assume_unique().queue_free() } );
+            //unsafe { bricks.assume_unique().queue_free() };
+            //bricks.map(|x, o| unsafe { x.tear_down(o) }).ok().unwrap_or_else(|| godot_print!("Unable to get ball"));                        
+        } else {
+            godot_print!("No ball");
+        }
+
+        self.bricks.clear();
+
+        if let Some(pad) = unsafe { owner.get_node_as_instance::<player_pad::PlayerPad>("pad")} {
+            godot_print!("Found ball");
+            
+            
+            
+            pad.map(|x, o| unsafe { o.assume_unique().hide() }).ok().unwrap_or_else(|| godot_print!("Unable to get pad"));                        
+            //bricks.map(|x, o| unsafe { x.tear_down(o) }).ok().unwrap_or_else(|| godot_print!("Unable to get ball"));                        
         } else {
             godot_print!("No ball");
         }
@@ -89,15 +122,17 @@ impl Main {
         
         
         let start_position = unsafe { owner.get_node_as::<Position2D>("start_position").unwrap() };
+        godot_print!("new_game 0");
         let player = unsafe {
             owner
                 .get_node_as_instance::<player_pad::PlayerPad>("pad")
                 .unwrap()
         };
+        godot_print!("new_game 1");
         let start_timer = unsafe { owner.get_node_as::<Timer>("start_timer").unwrap() };
 
         self.score = 0;
-
+        godot_print!("new_game 2");
         player
             .map(|x, o| x.start(&o, start_position.position()))
             .ok()
@@ -105,22 +140,25 @@ impl Main {
 
         start_timer.start(0.0);
 
-
+        godot_print!("new_game 3");
         let brick_scene_res = ResourceLoader::godot_singleton().load(
             GodotString::from_str("res://breakout/Brick.tscn"),
             GodotString::from_str("PackedScene"), false);
-
+        
+        godot_print!("new_game 3b");
         if let Some(brick_scene_res) = brick_scene_res.and_then(|s| s.cast::<PackedScene>()) {
-            godot_print!("brick Have scene 1");
+            godot_print!("new_game 3 1");
             
             let brick_scene: Ref<StaticBody2D, _> = instance_scene(&brick_scene_res);
-            
+            godot_print!("new_game 3 2");
             let pos_top_left = Vector2::new(50.0, 50.0);
             
             let brick_scene_s = brick_scene.into_shared();
+            godot_print!("new_game 3 3");
             self.bricks.push(brick_scene_s);
             let brick_scene = unsafe { brick_scene_s.assume_safe() };
             let bricks = unsafe { owner.get_node_as::<Node2D>("bricks").unwrap() };
+            godot_print!("new_game 3 4");
             for n in 1..4 {
                 let dup = brick_scene.duplicate(15).unwrap();
                 let r = unsafe { dup.assume_safe() }.cast::<StaticBody2D>().unwrap();
@@ -134,7 +172,7 @@ impl Main {
         } else {
             godot_print!("StarWorldLink could not load ship_link scene");
         }
-
+        godot_print!("new_game 4");
         
         let ball_scene_res = ResourceLoader::godot_singleton().load(
             GodotString::from_str("res://breakout/Ball.tscn"),
@@ -166,7 +204,7 @@ impl Main {
         } else {
             godot_print!("StarWorldLink could not load ship_link scene");
         }
-
+        godot_print!("new_game 5");
         let hud = unsafe { owner.get_node_as_instance::<hud::Hud>("hud").unwrap() };
         hud.map(|x, o| {
             x.update_score(&o, self.score);

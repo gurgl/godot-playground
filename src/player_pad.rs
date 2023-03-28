@@ -103,5 +103,12 @@ impl PlayerPad {
         collision_shape.set_disabled(false);
     }
 
+    pub fn tear_down(&self, owner: TRef<KinematicBody2D>) {
+        godot_print!("pad game over");
+        unsafe {        
+            owner.assume_unique().queue_free();
+        }
+    }
+
 
 }
