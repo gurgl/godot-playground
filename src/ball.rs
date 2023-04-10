@@ -1,9 +1,9 @@
 use std::fmt::Debug;
 
-use gdnative::api::{AnimatedSprite, KinematicBody2D, PhysicsBody2D, RigidBody2D, StaticBody2D, CollisionShape2D};
+use gdnative::api::{AnimatedSprite, KinematicBody2D, PhysicsBody2D, RigidBody2D, StaticBody2D, CollisionShape2D, RectangleShape2D};
 use gdnative::prelude::*;
 use rand::seq::SliceRandom;
-use crate::brick;
+use crate::{brick, player_pad};
 
 #[derive(NativeClass)]
 #[inherit(KinematicBody2D)]
@@ -38,12 +38,9 @@ impl Ball {
            
         let collision_info_opt = owner.move_and_collide(self.velocity * delta, true ,true, false);
         if let Some(collision_info_ref) = collision_info_opt {
-            //godot_print!("collision_info collision");     
-            let collision_info = unsafe { collision_info_ref.assume_safe() };
+            let collision_info: TRef<gdnative::api::KinematicCollision2D> = unsafe { collision_info_ref.assume_safe() };
             if let Some(collider) = collision_info.collider() {
-                //godot_print!("collider collision {:?}",res.get_class());     
                 if let Some(static_body) = unsafe { collider.assume_safe() }.cast::<StaticBody2D>() {
-                    //godot_print!("static body collision");     
                     if static_body.is_in_group("BrickGroup") {
                         godot_print!("brick collision");     
                         if let Some(brick) = unsafe { static_body.assume_shared().assume_unique() }.cast_instance::<brick::Brick>() {
@@ -60,9 +57,42 @@ impl Ball {
                         //self.tear_down(&owner);
                         return ()
                     }
-                }
+                    self.velocity = self.velocity.bounce(collision_info.normal());
+                } else if let Some(kinematic_body) = unsafe { collider.assume_safe() }.cast::<KinematicBody2D>() {
+                    
+                    if let Some(player_pad) = unsafe { kinematic_body.assume_shared().assume_unique() }.cast_instance::<player_pad::PlayerPad>() {
+                        
+                        let coll_pos = collision_info.position();
+                        let pad_pos = kinematic_body.position();
+                        let diff = coll_pos.x - pad_pos.x;
+                        let is_pad = kinematic_body.name() == GodotString::from_str("pad");    //kinematic_body.local_shape;
+                        if is_pad {
+                            
+                            let collision_shape = unsafe {
+                                kinematic_body
+                                    .get_node_as::<CollisionShape2D>("collision_shape_2d")
+                                    .unwrap()
+                            };                    
+                            if let Some(obj) = collision_shape.shape() {
+                                //let res : CollisionShape2D = unsafe { obj.assume_safe().assume_unique()  };
+                                let rect = unsafe { obj.assume_safe().assume_unique() }.cast::<RectangleShape2D>().unwrap();
+                                let res = rect.extents();
+                                
+                                godot_print!("cast 1 {}", res.x);
+                            }
+                        }
+
+
+                        //let msg = format!("brick pad collision {}", diff);
+                        godot_print!("brick pad collision {}", diff);     
+                        //unsafe { collision_info.assume_safe() };
+                        self.velocity = self.velocity.bounce(collision_info.normal());
+                        //brick.map(|x,_| x.hit(static_body.as_ref()));
+                        ()
+                    }                    
+                }  
             }
-            self.velocity = self.velocity.bounce(collision_info.normal());
+            
         }
     } 
 
