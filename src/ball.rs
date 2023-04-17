@@ -1,9 +1,12 @@
 use std::fmt::Debug;
 
+
 use gdnative::api::{AnimatedSprite, KinematicBody2D, PhysicsBody2D, RigidBody2D, StaticBody2D, CollisionShape2D, RectangleShape2D};
 use gdnative::prelude::*;
 use rand::seq::SliceRandom;
 use crate::{brick, player_pad};
+use crate::util::*;
+use crate::util::*;
 
 #[derive(NativeClass)]
 #[inherit(KinematicBody2D)]
@@ -17,9 +20,13 @@ pub struct Ball {
 
 }
 
+const D45:f32 = (std::f32::consts::PI)/4.0;
 
 #[methods]
 impl Ball {
+
+    
+
     fn new(_owner: &KinematicBody2D) -> Self {
         Ball {
             speed: 1.0,
@@ -74,9 +81,11 @@ impl Ball {
                     let width = padExtents.x;
                     
                     //let boo = (diff / width).tan()
-                    let foo = Vector2::new(diff,-width).normalized();
+                    let foo = Vector2::new(-diff,width).normalized();
                     godot_print!("cast 1 {} {}", foo.x, foo.y);
-                    Some(foo * self.velocity.length())
+                    let bounced = self.velocity.bounce(foo);
+                                            
+                    Some(Ball::clampAngle(bounced))
                 } else {
                     None
                 }
@@ -144,5 +153,23 @@ impl Ball {
         //owner.queue_free();
     }
 
+    pub fn angleCorrection(bounced:Vector2) -> f32 {
+        if let Some(angle) = bounced.as_angle() {
+            if angle < (D45) { 
+                D45 - angle  
+            } else if angle > (D45 * 3.0) { 
+                -(3.0 * D45 - angle)
+            } else { 
+                0.0 
+            }
+        } else {
+            panic!("crash and burn")
+        }
+    }
+
+    pub fn clampAngle(v:Vector2) -> Vector2 {
+        let correction = Ball::angleCorrection(v);
+        v.rotated(correction)
+    }
 
 }

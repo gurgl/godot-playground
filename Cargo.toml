@@ -12,5 +12,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 # gdnative = { path = "gdnative", version = "0.10.1" }
-gdnative = "=0.10.1"
+gdnative = "=0.10.2"
+float_eq = "1.0.1"
 rand = "0.8"

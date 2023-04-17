@@ -5,6 +5,8 @@ mod main_scene;
 mod player_pad;
 mod ball;
 mod brick;
+mod tests;
+mod util;
 
 fn init(handle: InitHandle) {
     godot_print!("init");
@@ -17,3 +19,6 @@ fn init(handle: InitHandle) {
 }
 
 godot_init!(init);
+
+
+
