@@ -78,10 +78,10 @@ impl Ball {
                     //let res : CollisionShape2D = unsafe { obj.assume_safe().assume_unique()  };
                     let rect = unsafe { obj.assume_safe().assume_unique() }.cast::<RectangleShape2D>().unwrap();
                     let padExtents = rect.extents();
-                    let width = padExtents.x;
+                    let widthHalved = padExtents.x;
                     
                     //let boo = (diff / width).tan()
-                    let foo = Vector2::new(-diff,width).normalized();
+                    let foo = Vector2::new(diff, widthHalved).normalized();
                     godot_print!("cast 1 {} {}", foo.x, foo.y);
                     let bounced = self.velocity.bounce(foo);
                                             
@@ -92,9 +92,10 @@ impl Ball {
             } else {
                 None
             };
-
-            //let msg = format!("brick pad collision {}", diff);
             godot_print!("brick pad collision {}", diff);     
+            
+            //let msg = format!("brick pad collision {}", diff);
+            
             //unsafe { collision_info.assume_safe() };            
             //brick.map(|x,_| x.hit(static_body.as_ref()));
             newVel            
